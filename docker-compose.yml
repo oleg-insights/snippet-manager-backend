@@ -1,0 +1,47 @@
+services:
+    app:
+        image: snippet-api
+        container_name: snippet-api
+        build: .
+        env_file:
+            - .env
+        ports:
+            - '3000:3000'
+        restart: unless-stopped
+        depends_on:
+            db:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+        environment:
+            DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?schema=public
+            REDIS_URL: redis://redis:6379
+
+    db:
+        image: postgres:16
+        container_name: snippet-db
+        restart: unless-stopped
+        environment:
+            POSTGRES_USER: ${DB_USER}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+            POSTGRES_DB: ${DB_NAME}
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U ${DB_USER} -d ${DB_NAME}']
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        volumes:
+            - db_data:/var/lib/postgresql/data
+    redis:
+        image: redis:alpine
+        container_name: snippet-redis
+        ports:
+            - '6379:6379'
+        restart: unless-stopped
+        healthcheck:
+            test: ['CMD', 'redis-cli', 'ping']
+            interval: 5s
+            timeout: 3s
+            retries: 5
+volumes:
+    db_data:

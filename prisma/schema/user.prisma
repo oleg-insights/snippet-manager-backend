@@ -1,0 +1,33 @@
+enum UserRole {
+    USER
+    ADMIN
+    SUPER_ADMIN
+}
+
+enum UserStatus {
+    ACTIVE
+    DELETED
+}
+
+model User {
+    id String @id @default(uuid())
+
+    name     String     @unique
+    email    String     @unique
+    password String
+    avatar   String?
+    role     UserRole   @default(USER)
+
+    authoredTags Tag[]      @relation("TagAuthor")
+    scopedTags   Tag[]      @relation("TagScope")
+    sessions     Session[]
+    templates    Template[]
+
+    status    UserStatus @default(ACTIVE)
+    deletedAt DateTime?
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    @@map("users") 
+}

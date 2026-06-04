@@ -1,0 +1,20 @@
+model Template {
+    id String @id @default(uuid())
+
+    title    String  @unique
+    content  Json
+    isPublic Boolean
+    useCount Int     @default(0) @map("use_count")
+
+    authorId String  @map("author_id")
+    author   User    @relation(fields: [authorId], references: [id])
+
+    updatedBy String? @map("updated_by")
+
+    tags Tag[]
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    @@map("templates") 
+}

@@ -1,0 +1,19 @@
+model Tag {
+    id String @id @default(uuid())
+
+    name String
+
+    authorId    String  @map("author_id")
+    author      User    @relation("TagAuthor", fields: [authorId], references: [id])
+
+    scopeUserId String? @map("scope_user_id")
+    scopeUser   User?   @relation("TagScope", fields: [scopeUserId], references: [id])
+
+    templates Template[]
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt      @map("updated_at")
+
+    @@unique([name, scopeUserId])
+    @@map("tags") 
+}
