@@ -11,6 +11,7 @@
 - **Docker**
 - **Swagger**
 - **Jest** (e2e тесты)
+- **GitHub Actions** (CI/CD)
 
 ### Функциональность
 
@@ -43,6 +44,16 @@
 1. Запустить приложение
 2. Убедиться, что в env.test указана тестовая БД
 3. Запустить тесты: `npm run test:e2e`
+
+### CI/CD
+
+Проект использует **GitHub Actions** для автоматической проверки качества кода. При каждом пуше в `main` и открытии Pull Request запускаются:
+
+- **Линтинг** — проверка стиля кода
+- **Сборка** — компиляция TypeScript
+- **E2E-тесты** — прогон тестов с PostgreSQL и Redis
+
+Статус последнего пайплайна: [![CI](https://github.com/oleg-insights/snippet-manager-api/actions/workflows/ci.yml/badge.svg)](https://github.com/oleg-insights/snippet-manager-api/actions/workflows/ci.yml)
 
 ### Доступные ресурсы:
 
