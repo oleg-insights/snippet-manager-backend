@@ -1,16 +1,4 @@
-import {
-    Body,
-    Controller,
-    Get,
-    HttpCode,
-    Param,
-    ParseUUIDPipe,
-    Patch,
-    Query,
-    Req,
-    Res,
-    UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Param, ParseUUIDPipe, Patch, Query, Res, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { toUserPrivateDto, toUserPublicDto } from './helpers/user-mapper.helper';
@@ -23,7 +11,6 @@ import {
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
-    ApiProperty,
     ApiTags,
     ApiUnauthorizedResponse,
 } from '@nestjs/swagger';

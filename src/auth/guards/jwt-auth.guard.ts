@@ -29,6 +29,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
         return true;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     handleRequest<TUser = any>(err: any, user: any): TUser {
         if (!err && user) return user;
         throw new UnauthorizedException('Access-токен не передан или невалиден');

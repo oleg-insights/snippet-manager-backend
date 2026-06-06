@@ -40,8 +40,9 @@ import { RefreshResponseDto } from './dto/refresh-response.dto';
 import { cookieConfig } from '../common/config/cookie.config';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import type { Request, Response } from 'express';
-import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
+import { Throttle } from '@nestjs/throttler';
 import { CustomThrottlerGuard } from 'src/common/guards/custom-trottler.guard';
+import { RefreshResponse } from './interfaces/refresh-response';
 
 @ApiTags('Auth')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -126,7 +127,7 @@ export class AuthController {
         @Req() req: Request,
         @Res({ passthrough: true }) res: Response,
     ): Promise<RefreshResponseDto> {
-        const refreshToken = req.cookies?.refreshToken;
+        const refreshToken: string = req.cookies?.refreshToken;
 
         if (!refreshToken) {
             throw new UnauthorizedException('Токен не передан');
@@ -137,7 +138,7 @@ export class AuthController {
             accessToken,
             refreshToken: newRefreshToken,
             expiresAt,
-        } = await this.authService.refresh(refreshToken, userAgent, ip);
+        }: RefreshResponse = await this.authService.refresh(refreshToken, userAgent, ip);
 
         res.cookie('refreshToken', newRefreshToken, {
             ...cookieConfig,
@@ -162,9 +163,9 @@ export class AuthController {
     @Post('logout')
     async logoutUser(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<void> {
         const authHeader = req.headers.authorization;
-        const accessToken = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : undefined;
+        const accessToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : undefined;
 
-        const refreshToken = req.cookies?.refreshToken;
+        const refreshToken: string = req.cookies?.refreshToken;
 
         await this.authService.logoutUser(accessToken, refreshToken);
 

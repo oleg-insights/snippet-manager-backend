@@ -22,8 +22,8 @@ export class AdminUsersService {
 
         if (!targetUser) throw new NotFoundException('Пользователь не найден');
 
-        const targetUserPriority = RolePriority[targetUser.role];
-        const currentUserPriority = RolePriority[currentUser.role];
+        const targetUserPriority: number = RolePriority[targetUser.role];
+        const currentUserPriority: number = RolePriority[currentUser.role];
 
         if (targetUserPriority === undefined || currentUserPriority === undefined) {
             throw new Error('Не определён приоритет для роли');
@@ -50,8 +50,8 @@ export class AdminUsersService {
 
         if (!targetUser) throw new NotFoundException('Пользователь не найден');
 
-        const targetUserPriority = RolePriority[targetUser.role];
-        const currentUserPriority = RolePriority[currentUser.role];
+        const targetUserPriority: number = RolePriority[targetUser.role];
+        const currentUserPriority: number = RolePriority[currentUser.role];
 
         if (targetUserPriority === undefined || currentUserPriority === undefined) {
             throw new Error('Не определён приоритет для роли');

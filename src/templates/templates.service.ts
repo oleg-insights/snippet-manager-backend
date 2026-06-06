@@ -216,7 +216,7 @@ export class TemplatesService {
             suggestedParents = recommendedTags.map((t) => ({ id: t.id, name: t.name, childIds }));
 
             availableTagsFromSelection = tagsToCheck
-                .filter(({ tag, tagTemplatesCount }) => {
+                .filter(({ tagTemplatesCount }) => {
                     // теги, привязанные к шаблонам выборки, но сужающие поиск
                     return tagTemplatesCount < selectionTemplatesCount;
                 })

@@ -1,9 +1,9 @@
 import { Injectable, ExecutionContext, HttpException, HttpStatus } from '@nestjs/common';
-import { ThrottlerGuard, ThrottlerException } from '@nestjs/throttler';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 @Injectable()
 export class CustomThrottlerGuard extends ThrottlerGuard {
-    protected throwThrottlingException(context: ExecutionContext): never {
+    protected throwThrottlingException(_: ExecutionContext): never {
         throw new HttpException(
             {
                 statusCode: 429,
