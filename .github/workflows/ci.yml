@@ -13,7 +13,7 @@ jobs:
       - name: Set node version
         uses: actions/setup-node@v6
         with:
-          node-version: 20-alpine
+          node-version: 20
       - name: Cache node_modules
         uses: actions/cache@v5
         with:
@@ -54,19 +54,19 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd: pg_isready
-          --health-interval: 10s
-          --health-timeout: 5s
-          --health-retries: 5
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
       redis:
         image: redis:alpine
         ports:
           - 6379:6379
         options: >-
-          --health-cmd: "redis-cli ping"
-          --health-interval: 10s
-          --health-timeout: 5s
-          --health-retries: 5
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Get code
