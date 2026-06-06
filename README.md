@@ -34,8 +34,9 @@
 2. Убедиться в наличии установленного Postgres. Или запустить в docker: `docker-compose up -d db`
 3. Убедиться в наличии установленного Redis. Или запустить в docker: `docker-compose up -d redis`
 4. Установить зависимости: `npm install`
-5. Сгенерировать клиент Prisma: `npx prisma generate`
-6. Запустить приложение: `npm run start:dev`
+5. Применить миграции: `npm run db:migrate:dev`
+6. Сгенерировать клиент Prisma: `npm run db:generate`
+7. Запустить приложение: `npm run start:dev`
 
 ### Тестирование:
 

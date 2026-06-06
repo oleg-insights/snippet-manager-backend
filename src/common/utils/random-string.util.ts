@@ -1,3 +1,5 @@
 export const randomString = (length: number): string => {
-    return Math.random().toString(36).slice(2, 2 + length)
-}
+    return Math.random()
+        .toString(36)
+        .slice(2, 2 + length);
+};

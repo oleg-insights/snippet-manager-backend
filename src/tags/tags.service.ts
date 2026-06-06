@@ -21,7 +21,7 @@ export class TagsService {
         type AllowedSortField = (typeof allowedSortFields)[number];
 
         const isAllowedSortField = (value: string): value is AllowedSortField => {
-            return allowedSortFields.includes(value as AllowedSortField);
+            return allowedSortFields.includes(value);
         };
 
         if (!isAllowedSortField(sortBy)) {
