@@ -40,7 +40,7 @@ jobs:
       - name: Install deps
         run: npm ci
       - name: Generate prisma client
-        run: npx prisma generate
+        run: SKIP_ENV_VALIDATION=1 npx prisma generate
       - name: Build app
         run: npm run build
   test:
