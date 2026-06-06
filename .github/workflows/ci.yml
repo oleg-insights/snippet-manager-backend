@@ -39,6 +39,8 @@ jobs:
           key: node-modules-${{ hashFiles('**/package.json') }}
       - name: Install deps
         run: npm ci
+      - name: Generate prisma client
+        run: npx prisma generate
       - name: Build app
         run: npm run build
   test:
@@ -83,7 +85,7 @@ jobs:
       - name: Install deps
         run: npm ci
       - name: Test e2e
-        run: npm run test:e2e
+        run: npm run test:e2e:ci
         env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
           REDIS_URL: redis://localhost:6379
