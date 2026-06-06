@@ -84,6 +84,8 @@ jobs:
           key: node-modules-${{ hashFiles('**/package.json') }}
       - name: Install deps
         run: npm ci
+      - name: Generate prisma client
+        run: SKIP_ENV_VALIDATION=1 npx prisma generate
       - name: Test e2e
         run: npm run test:e2e:ci
         env:
