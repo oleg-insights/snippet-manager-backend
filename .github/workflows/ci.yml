@@ -31,7 +31,7 @@ jobs:
       - name: Set node version
         uses: actions/setup-node@v6
         with:
-          node-version: 20-alpine
+          node-version: 20
       - name: Cache node_modules
         uses: actions/cache@v5
         with:
@@ -74,7 +74,7 @@ jobs:
       - name: Set node version
         uses: actions/setup-node@v6
         with:
-          node-version: 20-alpine
+          node-version: 20
       - name: Cache node_modules
         uses: actions/cache@v5
         with:
