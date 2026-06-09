@@ -9,6 +9,7 @@ import { RedisModule } from './redis/redis.module';
 import { AdminModule } from './admin/admin.module';
 import { envSchema } from './common/config/env.validation';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
     imports: [
@@ -36,6 +37,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
         TemplatesModule,
         UsersModule,
         AdminModule,
+        NotificationsModule,
     ],
 })
 export class AppModule {}

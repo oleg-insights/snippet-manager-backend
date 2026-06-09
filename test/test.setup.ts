@@ -25,6 +25,7 @@ export const setupTestApplication = async (): Promise<TestContext> => {
     app.setGlobalPrefix('api');
     app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
     app.use(cookieParser());
+
     await app.init();
 
     const prisma = moduleRef.get(PrismaService);

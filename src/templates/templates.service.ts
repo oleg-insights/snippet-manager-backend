@@ -16,6 +16,7 @@ import { UpdateTemplateDto } from './dto/update-template.dto';
 import { SuggestedParentDto } from './dto/suggested-parent.dto';
 import { buildOrderBy } from 'src/common/utils/sorting.util';
 import { sanitizeContent } from 'src/common/utils/content-sanitizer.util';
+import { NotificationsGateway } from 'src/notifications/notifications.gateway';
 
 interface TemplateWithTags extends Template {
     tags: { id: string; name: string }[];
@@ -23,7 +24,10 @@ interface TemplateWithTags extends Template {
 
 @Injectable()
 export class TemplatesService {
-    constructor(private prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly notifications: NotificationsGateway,
+    ) {}
 
     async create(userId: string, dto: CreateTemplateDto): Promise<TemplateWithTags> {
         const { title, content, tagIds: dtoTagIds = [], newTagNames = [] } = dto;
@@ -437,7 +441,7 @@ export class TemplatesService {
     async publish(userId: string, templateId: string): Promise<TemplateWithTags> {
         const template = await this.prisma.template.findUnique({
             where: { id: templateId },
-            select: { authorId: true, isPublic: true },
+            select: { title: true, authorId: true, isPublic: true },
         });
 
         if (!template) {
@@ -482,6 +486,8 @@ export class TemplatesService {
                 include: { tags: { select: { id: true, name: true } } },
             });
         });
+
+        this.notifications.newTemplateNotification({ title: template.title });
 
         return publishedTemplate;
     }
