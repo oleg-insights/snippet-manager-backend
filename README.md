@@ -10,6 +10,7 @@
 - **Redis**
 - **Docker**
 - **Swagger**
+- **Socket.IO** (WebSockets)
 - **Jest** (e2e тесты)
 - **GitHub Actions** (CI/CD)
 
@@ -23,6 +24,7 @@
 - Пагинация и сортировка
 - Защита от **XSS** (санитизация контента)
 - Rate limiting
+- Уведомления в реальном времени через **WebSockets** (оповещение о публикации шаблона)
 
 ### Развертывание и запуск (docker-compose):
 
