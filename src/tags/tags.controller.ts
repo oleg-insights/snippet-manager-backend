@@ -18,18 +18,25 @@ import { ForbiddenResponseDto, UnauthorizedResponseDto } from 'src/common/dto/er
 import { toTagResponseDto } from './helpers/tag-mapper.helper';
 import { MergeTagsDto } from './dto/merge-tags.dto';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
+import { JwtOptionalAuthGuard } from 'src/auth/guards/jwt-optional-auth.guard';
+import { OptionalCurrentUserId } from 'src/common/decorators/optional-current-user-id.decorator';
 
 @ApiTags('Tags')
 @Controller('tags')
 export class TagsController {
     constructor(private readonly tagsService: TagsService) {}
 
-    @ApiOperation({ summary: 'Получение тегов' })
+    @ApiOperation({ summary: 'Получение доступных тегов' })
     @ApiOkResponse({ description: 'Теги успешно получены', type: TagListResponseDto })
     @ApiBadRequestResponse({ description: 'Указаны невалидные параметры пагинации', type: BadRequestResponseDto })
+    @ApiBearerAuth()
+    @UseGuards(JwtOptionalAuthGuard)
     @Get()
-    async findAll(@Query() pagination: PaginationDto): Promise<TagListResponseDto> {
-        const result = await this.tagsService.findAll(pagination);
+    async findAll(
+        @Query() pagination: PaginationDto,
+        @OptionalCurrentUserId() userId: string | null,
+    ): Promise<TagListResponseDto> {
+        const result = await this.tagsService.findAll(pagination, userId);
         return { data: result.tags, meta: result.meta };
     }
 

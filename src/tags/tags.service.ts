@@ -10,7 +10,10 @@ import { buildOrderBy } from 'src/common/utils/sorting.util';
 export class TagsService {
     constructor(private prisma: PrismaService) {}
 
-    async findAll(pagination: PaginationDto): Promise<{
+    async findAll(
+        pagination: PaginationDto,
+        userId: string | null,
+    ): Promise<{
         tags: Tag[];
         meta: PaginationMetaResponseDto;
     }> {
@@ -37,8 +40,15 @@ export class TagsService {
                 take: limit,
                 skip: (page - 1) * limit,
                 orderBy,
+                where: {
+                    OR: [{ scopeUserId: userId }, { scopeUserId: null }],
+                },
             }),
-            this.prisma.tag.count(),
+            this.prisma.tag.count({
+                where: {
+                    OR: [{ scopeUserId: userId }, { scopeUserId: null }],
+                },
+            }),
         ]);
 
         return {
