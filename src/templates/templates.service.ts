@@ -487,7 +487,7 @@ export class TemplatesService {
             });
         });
 
-        this.notifications.newTemplateNotification({ title: template.title });
+        this.notifications.newTemplateNotification({ title: template.title, authorId: template.authorId });
 
         return publishedTemplate;
     }

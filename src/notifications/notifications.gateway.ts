@@ -5,10 +5,11 @@ import { Server } from 'socket.io';
 export class NotificationsGateway {
     @WebSocketServer() server: Server;
 
-    newTemplateNotification(body: { title: string }): void {
+    newTemplateNotification(body: { title: string; authorId: string }): void {
         this.server.emit('receive_publish', {
             title: 'Опубликован новый шаблон',
             text: body.title,
+            authorId: body.authorId,
         });
     }
 }
