@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { TagPreviewDto } from 'src/tags/dto/tag-preview.dto';
 import { ContentBlockDto } from './create-template.dto';
+import { AuthorPreviewDto } from './author-preview.dto';
 
 export class TemplateResponseDto {
     @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000', description: 'ID шаблона (uuid)' })
@@ -24,9 +25,12 @@ export class TemplateResponseDto {
     @Expose()
     useCount: number;
 
-    @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000', description: 'ID автора шаблона' })
+    @ApiProperty({
+        type: () => AuthorPreviewDto,
+        description: 'Превью автора шаблона',
+    })
     @Expose()
-    authorId: string;
+    author: AuthorPreviewDto;
 
     @ApiPropertyOptional({
         example: '123e4567-e89b-12d3-a456-426614174000',

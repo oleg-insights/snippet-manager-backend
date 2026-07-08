@@ -18,9 +18,13 @@ import { buildOrderBy } from 'src/common/utils/sorting.util';
 import { sanitizeContent } from 'src/common/utils/content-sanitizer.util';
 import { NotificationsGateway } from 'src/notifications/notifications.gateway';
 
-interface TemplateWithTags extends Template {
-    tags: { id: string; name: string }[];
-}
+export type TemplateWithAuthorAndTags = Prisma.TemplateGetPayload<{
+    include: {
+        tags: { select: { id: true; name: true } };
+        author: { select: { id: true; name: true } };
+    };
+    omit: { authorId: true };
+}>;
 
 @Injectable()
 export class TemplatesService {
@@ -29,7 +33,7 @@ export class TemplatesService {
         private readonly notifications: NotificationsGateway,
     ) {}
 
-    async create(userId: string, dto: CreateTemplateDto): Promise<TemplateWithTags> {
+    async create(userId: string, dto: CreateTemplateDto): Promise<TemplateWithAuthorAndTags> {
         const { title, content, tagIds: dtoTagIds = [], newTagNames = [] } = dto;
 
         const existingTemplate = await this.prisma.template.findUnique({
@@ -83,6 +87,12 @@ export class TemplatesService {
                 tags: {
                     select: { id: true, name: true },
                 },
+                author: {
+                    select: { id: true, name: true },
+                },
+            },
+            omit: {
+                authorId: true,
             },
         });
 
@@ -93,7 +103,7 @@ export class TemplatesService {
         userId: string | null,
         query: TemplateQueryDto,
     ): Promise<{
-        templates: TemplateWithTags[];
+        templates: TemplateWithAuthorAndTags[];
         meta: PaginationMetaResponseDto;
         availableTags: TagPreviewDto[];
         selectedTags: TagPreviewDto[];
@@ -158,6 +168,7 @@ export class TemplatesService {
                 orderBy,
                 include: {
                     tags: { select: { id: true, name: true } },
+                    author: { select: { id: true, name: true } },
                 },
             }),
             this.prisma.template.count({ where: templatesFilter }),
@@ -264,7 +275,7 @@ export class TemplatesService {
         userId: string,
         dto: PaginationDto,
     ): Promise<{
-        templates: TemplateWithTags[];
+        templates: TemplateWithAuthorAndTags[];
         meta: PaginationMetaResponseDto;
     }> {
         const { page, limit, sortBy, order } = dto;
@@ -297,6 +308,12 @@ export class TemplatesService {
                     tags: {
                         select: { id: true, name: true },
                     },
+                    author: {
+                        select: { id: true, name: true },
+                    },
+                },
+                omit: {
+                    authorId: true,
                 },
             }),
             this.prisma.template.count({ where: templatesFilter }),
@@ -313,7 +330,7 @@ export class TemplatesService {
         };
     }
 
-    async getOne(userId: string | null, templateId: string): Promise<TemplateWithTags> {
+    async getOne(userId: string | null, templateId: string): Promise<TemplateWithAuthorAndTags> {
         const template = await this.prisma.template.findUnique({
             where: { id: templateId },
             select: { authorId: true, isPublic: true },
@@ -335,11 +352,17 @@ export class TemplatesService {
                 tags: {
                     select: { id: true, name: true },
                 },
+                author: {
+                    select: { id: true, name: true },
+                },
+            },
+            omit: {
+                authorId: true,
             },
         });
     }
 
-    async update(userId: string, templateId: string, dto: UpdateTemplateDto): Promise<TemplateWithTags> {
+    async update(userId: string, templateId: string, dto: UpdateTemplateDto): Promise<TemplateWithAuthorAndTags> {
         const template = await this.prisma.template.findUnique({
             where: { id: templateId },
             select: { authorId: true },
@@ -432,13 +455,19 @@ export class TemplatesService {
                 tags: {
                     select: { id: true, name: true },
                 },
+                author: {
+                    select: { id: true, name: true },
+                },
+            },
+            omit: {
+                authorId: true,
             },
         });
 
         return updatedTemplate;
     }
 
-    async publish(userId: string, templateId: string): Promise<TemplateWithTags> {
+    async publish(userId: string, templateId: string): Promise<TemplateWithAuthorAndTags> {
         const template = await this.prisma.template.findUnique({
             where: { id: templateId },
             select: { title: true, authorId: true, isPublic: true },
@@ -459,6 +488,12 @@ export class TemplatesService {
                     tags: {
                         select: { id: true, name: true },
                     },
+                    author: {
+                        select: { id: true, name: true },
+                    },
+                },
+                omit: {
+                    authorId: true,
                 },
             });
         }
@@ -483,7 +518,11 @@ export class TemplatesService {
             return await tx.template.update({
                 where: { id: templateId },
                 data: { isPublic: true },
-                include: { tags: { select: { id: true, name: true } } },
+                include: {
+                    tags: { select: { id: true, name: true } },
+                    author: { select: { id: true, name: true } },
+                },
+                omit: { authorId: true },
             });
         });
 
@@ -492,7 +531,7 @@ export class TemplatesService {
         return publishedTemplate;
     }
 
-    async unpublish(userId: string, templateId: string): Promise<TemplateWithTags> {
+    async unpublish(userId: string, templateId: string): Promise<TemplateWithAuthorAndTags> {
         const template = await this.prisma.template.findUnique({
             where: { id: templateId },
             select: { authorId: true, isPublic: true },
@@ -513,7 +552,11 @@ export class TemplatesService {
                     tags: {
                         select: { id: true, name: true },
                     },
+                    author: {
+                        select: { id: true, name: true },
+                    },
                 },
+                omit: { authorId: true },
             });
         }
 
@@ -541,7 +584,11 @@ export class TemplatesService {
             return await tx.template.update({
                 where: { id: templateId },
                 data: { isPublic: false },
-                include: { tags: { select: { id: true, name: true } } },
+                include: {
+                    tags: { select: { id: true, name: true } },
+                    author: { select: { id: true, name: true } },
+                },
+                omit: { authorId: true },
             });
         });
 
