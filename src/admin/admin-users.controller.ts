@@ -1,4 +1,4 @@
-import { Controller, Param, Delete, UseGuards, Body, Patch, ParseUUIDPipe, HttpCode } from '@nestjs/common';
+import { Controller, Param, Delete, UseGuards, Body, Patch, ParseUUIDPipe, HttpCode, Get, Query } from '@nestjs/common';
 import { AdminUsersService } from './admin-users.service';
 import {
     ApiBadRequestResponse,
@@ -22,6 +22,9 @@ import { ForbiddenResponseDto, NotFoundResponseDto, UnauthorizedResponseDto } fr
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import type { JwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { UserAdminListResponseDto } from 'src/users/dto/user-admin-list-response.dto';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { UsersService } from 'src/users/users.service';
 
 @ApiTags('Admin')
 @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
@@ -29,7 +32,22 @@ import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 @ApiBearerAuth()
 @Controller('admin/users')
 export class AdminUsersController {
-    constructor(private readonly adminUsersService: AdminUsersService) {}
+    constructor(
+        private readonly adminUsersService: AdminUsersService,
+        private readonly usersService: UsersService,
+    ) {}
+
+    @ApiOperation({ summary: 'Получение списка пользователей' })
+    @ApiOkResponse({ description: 'Пользователи успешно получены', type: UserAdminListResponseDto })
+    @ApiBadRequestResponse({ description: 'Указаны некорректные параметры пагинации', type: BadRequestResponseDto })
+    @ApiUnauthorizedResponse({ description: 'Требуется авторизация', type: UnauthorizedResponseDto })
+    @Get()
+    async findAll(@Query() pagination: PaginationDto): Promise<UserAdminListResponseDto> {
+        const result = await this.usersService.findAll(pagination);
+        const users = result.users.map((user) => toUserAdminDto(user));
+
+        return { data: users, meta: result.meta };
+    }
 
     @ApiOperation({ summary: 'Изменение роли пользователя' })
     @ApiOkResponse({ description: 'Роль успешно изменена', type: () => UserAdminResponseDto })
