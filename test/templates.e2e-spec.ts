@@ -129,7 +129,7 @@ describe('GET /api/templates', () => {
         expect(user1Response.body.data).toBeInstanceOf(Array);
         expect(user1Response.body.data).toHaveLength(2);
         for (const template of user1Response.body.data) {
-            expect(template.authorId === user1.id || template.isPublic === true).toBe(true);
+            expect(template.author.id === user1.id || template.isPublic === true).toBe(true);
         }
         expect(user1Response.body.data[0].title > user1Response.body.data[1].title).toBe(true);
     });
@@ -168,7 +168,7 @@ describe('GET /api/templates/me', () => {
         expect(templates).toBeInstanceOf(Array);
         expect(templates).toHaveLength(3);
         for (const template of templates) {
-            expect(template.authorId).toBe(user.id);
+            expect(template.author.id).toBe(user.id);
         }
         expect(templates[0].title > templates[1].title).toBe(true);
 
