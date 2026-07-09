@@ -1,5 +1,5 @@
 services:
-    app:
+    backend:
         image: snippet-api
         container_name: snippet-api
         build: .
@@ -43,5 +43,13 @@ services:
             interval: 5s
             timeout: 3s
             retries: 5
+    frontend:
+        build: ../snippet-manager-frontend
+        container_name: snippet-web
+        ports:
+        - "80:80"
+        depends_on:
+        - backend
+        restart: unless-stopped
 volumes:
     db_data:
