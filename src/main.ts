@@ -12,7 +12,7 @@ async function bootstrap() {
     app.use(helmet());
     app.setGlobalPrefix('api');
     app.enableCors({
-        origin: process.env.ALLOWED_ORIGINS?.split(',') ?? ['http://localhost:3000'],
+        origin: process.env.ALLOWED_ORIGINS?.split(',').map((orig) => orig.trim()) ?? ['http://localhost:3000'],
         methods: 'POST, GET, PATCH, DELETE',
         credentials: true,
     });
