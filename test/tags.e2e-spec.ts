@@ -18,7 +18,12 @@ describe('GET /api/tags', () => {
     it('should return 200 and tag list based on pagination', async () => {
         const user = await context.generator.createUser();
 
-        await Promise.all(Array.from({ length: 5 }).map(() => context.generator.createTag(user.id)));
+        const createdTags = await Promise.all(
+            Array.from({ length: 5 }).map(() => context.generator.createTag(user.id)),
+        );
+        const createdTagIds = createdTags.map((t) => t.id);
+
+        await context.generator.createTemplate(user.id, { tagIds: createdTagIds, isPublic: true });
 
         const response = await request(context.app.getHttpServer())
             .get('/api/tags')
