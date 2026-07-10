@@ -36,7 +36,7 @@ export class TemplatesService {
     async create(userId: string, dto: CreateTemplateDto): Promise<TemplateWithAuthorAndTags> {
         const { title, content, tagIds: dtoTagIds = [], newTagNames = [] } = dto;
 
-        const existingTemplate = await this.prisma.template.findUnique({
+        const existingTemplate = await this.prisma.template.findFirst({
             where: { title, authorId: userId },
         });
 
@@ -379,7 +379,7 @@ export class TemplatesService {
         const data: Prisma.TemplateUpdateInput = {};
 
         if (title !== undefined) {
-            const existingTemplate = await this.prisma.template.findUnique({
+            const existingTemplate = await this.prisma.template.findFirst({
                 where: { title, NOT: { id: templateId } },
             });
 
