@@ -41,7 +41,17 @@ export class TagsService {
                 skip: (page - 1) * limit,
                 orderBy,
                 where: {
-                    OR: [{ scopeUserId: userId }, { scopeUserId: null }],
+                    OR: [
+                        ...(userId ? [{ scopeUserId: userId }] : []),
+                        {
+                            scopeUserId: null,
+                            templates: {
+                                some: {
+                                    OR: [{ isPublic: true }, ...(userId ? [{ authorId: userId }] : [])],
+                                },
+                            },
+                        },
+                    ],
                 },
             }),
             this.prisma.tag.count({
