@@ -40,7 +40,7 @@ export class TemplatesService {
             where: { title, authorId: userId },
         });
 
-        if (existingTemplate) throw new ConflictException('Шаблон с таким заголовком уже существует');
+        if (existingTemplate) throw new ConflictException('У вас уже есть шаблон с таким заголовком');
 
         const preparedContent: Prisma.InputJsonValue = content
             .map((block) => sanitizeContent(block))
