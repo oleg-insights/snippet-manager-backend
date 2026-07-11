@@ -3,6 +3,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { UserRole, UserStatus } from '@prisma/client';
+import { templatesData } from './seed-data/templates';
 
 @Injectable()
 export class SeedService implements OnModuleInit {
@@ -14,7 +15,8 @@ export class SeedService implements OnModuleInit {
     ) {}
 
     async onModuleInit() {
-        await this.seedAdmin();
+        const admin = await this.seedAdmin();
+        await this.seedTemplates(admin!.id);
     }
 
     private async seedAdmin() {
@@ -31,7 +33,7 @@ export class SeedService implements OnModuleInit {
 
         if (existingAdmin) {
             this.logger.log('Админ уже существует');
-            return;
+            return existingAdmin;
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -47,5 +49,49 @@ export class SeedService implements OnModuleInit {
         });
 
         this.logger.log(`Создан админ ${admin.email}`);
+        return admin;
+    }
+
+    private async seedTemplates(userId: string) {
+        const count = await this.prisma.template.count();
+        if (count > 0) {
+            this.logger.log('Шаблоны есть, демо не будут созданы');
+            return;
+        }
+
+        // Создаём шаблоны
+        for (const tpl of templatesData) {
+            // Создание тегов
+            const tagIds: string[] = [];
+            for (const tagName of tpl.tagNames) {
+                const existingTag = await this.prisma.tag.findFirst({
+                    where: { name: tagName },
+                });
+
+                if (existingTag) {
+                    tagIds.push(existingTag.id);
+                } else {
+                    const tag = await this.prisma.tag.create({
+                        data: {
+                            name: tagName,
+                            authorId: userId,
+                            scopeUserId: null,
+                        },
+                    });
+                    if (tag) tagIds.push(tag.id);
+                }
+            }
+
+            await this.prisma.template.create({
+                data: {
+                    title: tpl.title,
+                    content: tpl.content,
+                    authorId: userId,
+                    isPublic: true,
+                    tags: { connect: tagIds.map((id) => ({ id })) },
+                },
+            });
+        }
+        this.logger.log('Шаблоны и теги созданы');
     }
 }
