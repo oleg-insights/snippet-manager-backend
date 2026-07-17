@@ -21,8 +21,8 @@ export class PaginationDto {
     })
     @IsOptional()
     @IsInt({ message: 'Параметр limit должен быть целым числом' })
-    @Min(1, { message: 'Параметр limit должен иметь значение 1 или больше' })
-    @Max(50, { message: 'Максимальное значение параметра limit - 50' })
+    @Min(0, { message: 'Параметр limit должен иметь значение 0 или больше' })
+    @Max(1000, { message: 'Максимальное значение параметра limit - 1000' })
     @Type(() => Number)
     limit: number = 10;
 

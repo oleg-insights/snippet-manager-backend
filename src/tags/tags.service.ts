@@ -37,7 +37,7 @@ export class TagsService {
 
         const [tags, totalItems] = await Promise.all([
             this.prisma.tag.findMany({
-                take: limit,
+                ...(limit > 0 ? { take: limit } : {}),
                 skip: (page - 1) * limit,
                 orderBy,
                 where: {
