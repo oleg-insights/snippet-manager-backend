@@ -163,7 +163,7 @@ export class TemplatesService {
         const [templates, totalItems] = await Promise.all([
             this.prisma.template.findMany({
                 where: templatesFilter,
-                take: limit,
+                ...(limit > 0 ? { take: limit } : {}),
                 skip: (page - 1) * limit,
                 orderBy,
                 include: {
