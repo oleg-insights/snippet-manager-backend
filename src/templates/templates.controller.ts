@@ -41,7 +41,6 @@ import { toTemplateResponseDto } from './helpers/template-mapper.helper';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { TemplateListResponseDto } from './dto/template-list-response.dto';
 import { JwtOptionalAuthGuard } from 'src/auth/guards/jwt-optional-auth.guard';
-import { OptionalCurrentUserId } from 'src/common/decorators/optional-current-user-id.decorator';
 import { OptionalCurrentUser } from 'src/common/decorators/optional-current-user.decorator ';
 import { TemplateQueryDto } from './dto/template-query.dto';
 import { MyTemplateListResponseDto } from './dto/my-template-list-response.dto';
@@ -124,9 +123,9 @@ export class TemplatesController {
             }),
         )
         templateId: string,
-        @OptionalCurrentUserId() userId: string | null,
+        @OptionalCurrentUser() user: { sub: string; role: string } | null,
     ): Promise<TemplateResponseDto> {
-        const template = await this.templatesService.getOne(userId, templateId);
+        const template = await this.templatesService.getOne(user, templateId);
         return toTemplateResponseDto(template);
     }
 

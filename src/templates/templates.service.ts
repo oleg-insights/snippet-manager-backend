@@ -347,7 +347,7 @@ export class TemplatesService {
         };
     }
 
-    async getOne(userId: string | null, templateId: string): Promise<TemplateWithAuthorAndTags> {
+    async getOne(user: { sub: string; role: string } | null, templateId: string): Promise<TemplateWithAuthorAndTags> {
         const template = await this.prisma.template.findUnique({
             where: { id: templateId },
             select: { authorId: true, isPublic: true },
@@ -355,10 +355,11 @@ export class TemplatesService {
 
         if (!template) throw new NotFoundException('Шаблон не найден');
 
-        const isAuthor = template.authorId === userId;
+        const isAdmin = user?.role === UserRole.ADMIN;
+        const isAuthor = template.authorId === user?.sub;
         const isPublic = template.isPublic;
 
-        if (!isAuthor && !isPublic) {
+        if (!isAdmin && !isAuthor && !isPublic) {
             throw new ForbiddenException('Недостаточно прав для просмотра этого шаблона');
         }
 
