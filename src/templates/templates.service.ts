@@ -143,6 +143,10 @@ export class TemplatesService {
                     id: { in: tagIds },
                     OR: [{ scopeUserId: null }, ...(user ? [{ scopeUserId: user?.sub }] : [])],
                 };
+            } else {
+                selectedTagsWhere = {
+                    id: { in: tagIds },
+                };
             }
 
             selectedTags = await this.prisma.tag.findMany({

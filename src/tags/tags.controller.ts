@@ -19,7 +19,7 @@ import { toTagResponseDto } from './helpers/tag-mapper.helper';
 import { MergeTagsDto } from './dto/merge-tags.dto';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
 import { JwtOptionalAuthGuard } from 'src/auth/guards/jwt-optional-auth.guard';
-import { OptionalCurrentUserId } from 'src/common/decorators/optional-current-user-id.decorator';
+import { OptionalCurrentUser } from 'src/common/decorators/optional-current-user.decorator ';
 
 @ApiTags('Tags')
 @Controller('tags')
@@ -34,9 +34,9 @@ export class TagsController {
     @Get()
     async findAll(
         @Query() pagination: PaginationDto,
-        @OptionalCurrentUserId() userId: string | null,
+        @OptionalCurrentUser() user: { sub: string; role: string } | null,
     ): Promise<TagListResponseDto> {
-        const result = await this.tagsService.findAll(pagination, userId);
+        const result = await this.tagsService.findAll(pagination, user);
         return { data: result.tags, meta: result.meta };
     }
 

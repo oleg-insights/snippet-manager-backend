@@ -2,7 +2,7 @@ import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/com
 import { PrismaService } from '../prisma/prisma.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { PaginationMetaResponseDto } from 'src/common/dto/list-response.dto';
-import { Tag } from '@prisma/client';
+import { Prisma, Tag, UserRole } from '@prisma/client';
 import { MergeTagsDto } from './dto/merge-tags.dto';
 import { buildOrderBy } from 'src/common/utils/sorting.util';
 
@@ -12,7 +12,7 @@ export class TagsService {
 
     async findAll(
         pagination: PaginationDto,
-        userId: string | null,
+        user: { sub: string; role: string } | null,
     ): Promise<{
         tags: Tag[];
         meta: PaginationMetaResponseDto;
@@ -33,31 +33,39 @@ export class TagsService {
             );
         }
 
+        const isAdmin = user?.role === UserRole.ADMIN;
+
         const orderBy = buildOrderBy(sortBy, order);
+
+        let tagsWhere: Prisma.TagWhereInput = {};
+
+        if (!isAdmin && user) {
+            tagsWhere = {
+                OR: [
+                    { scopeUserId: user.sub },
+                    {
+                        AND: [
+                            { scopeUserId: null },
+                            { templates: { some: { OR: [{ isPublic: true }, { authorId: user.sub }] } } },
+                        ],
+                    },
+                ],
+            };
+        } else if (!user) {
+            tagsWhere = {
+                AND: [{ scopeUserId: null }, { templates: { some: { isPublic: true } } }],
+            };
+        }
 
         const [tags, totalItems] = await Promise.all([
             this.prisma.tag.findMany({
                 ...(limit > 0 ? { take: limit } : {}),
                 skip: (page - 1) * limit,
                 orderBy,
-                where: {
-                    OR: [
-                        ...(userId ? [{ scopeUserId: userId }] : []),
-                        {
-                            scopeUserId: null,
-                            templates: {
-                                some: {
-                                    OR: [{ isPublic: true }, ...(userId ? [{ authorId: userId }] : [])],
-                                },
-                            },
-                        },
-                    ],
-                },
+                where: tagsWhere,
             }),
             this.prisma.tag.count({
-                where: {
-                    OR: [{ scopeUserId: userId }, { scopeUserId: null }],
-                },
+                where: tagsWhere,
             }),
         ]);
 
