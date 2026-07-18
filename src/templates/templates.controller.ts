@@ -45,6 +45,7 @@ import { OptionalCurrentUser } from 'src/common/decorators/optional-current-user
 import { TemplateQueryDto } from './dto/template-query.dto';
 import { MyTemplateListResponseDto } from './dto/my-template-list-response.dto';
 import { UpdateTemplateDto } from './dto/update-template.dto';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 
 @ApiTags('Templates')
 @Controller('templates')
@@ -230,8 +231,8 @@ export class TemplatesController {
             }),
         )
         templateId: string,
-        @CurrentUserId() userId: string,
+        @CurrentUser() user: { sub: string; role: string },
     ): Promise<void> {
-        await this.templatesService.remove(userId, templateId);
+        await this.templatesService.remove(user, templateId);
     }
 }

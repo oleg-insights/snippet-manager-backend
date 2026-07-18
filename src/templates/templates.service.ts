@@ -172,7 +172,7 @@ export class TemplatesService {
               ? [{ OR: [{ isPublic: true }, { authorId: user?.sub }] }]
               : [{ isPublic: true }];
 
-        let templatesFilter: Prisma.TemplateWhereInput = {
+        const templatesFilter: Prisma.TemplateWhereInput = {
             AND: [
                 // Шаблон содержит все переданные разрешенные теги
                 ...allowedTagIdsConditions,
@@ -617,7 +617,7 @@ export class TemplatesService {
         return unpublishedTemplate;
     }
 
-    async remove(userId: string, templateId: string): Promise<void> {
+    async remove(user: { sub: string; role: string }, templateId: string): Promise<void> {
         const template = await this.prisma.template.findUnique({
             where: { id: templateId },
             select: { authorId: true },
@@ -627,7 +627,10 @@ export class TemplatesService {
             throw new NotFoundException('Шаблон не найден');
         }
 
-        if (template.authorId !== userId) {
+        const isAdmin = user.role === UserRole.ADMIN;
+        const isAuthor = template.authorId === user.sub;
+
+        if (!isAuthor && !isAdmin) {
             throw new ForbiddenException('Недостаточно прав для действий с этим шаблоном');
         }
 
