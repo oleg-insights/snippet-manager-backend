@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, UserRole } from '@prisma/client';
 import {
     BadRequestException,
     ConflictException,
@@ -100,7 +100,7 @@ export class TemplatesService {
     }
 
     async getAll(
-        userId: string | null,
+        user: { sub: string; role: string } | null,
         query: TemplateQueryDto,
     ): Promise<{
         templates: TemplateWithAuthorAndTags[];
@@ -109,6 +109,8 @@ export class TemplatesService {
         selectedTags: TagPreviewDto[];
         suggestedParents: SuggestedParentDto[];
     }> {
+        const isAdmin = user?.role === UserRole.ADMIN;
+
         const { page, limit, sortBy, order, tagIds } = query;
 
         const allowedSortFields = ['id', 'title', 'createdAt'] as const;
@@ -134,11 +136,17 @@ export class TemplatesService {
         let allowedTagIds: string[] = [];
 
         if (tagIds && tagIds.length > 0) {
-            selectedTags = await this.prisma.tag.findMany({
-                where: {
+            let selectedTagsWhere: Prisma.TagWhereInput = {};
+
+            if (!isAdmin) {
+                selectedTagsWhere = {
                     id: { in: tagIds },
-                    OR: [{ scopeUserId: null }, ...(userId ? [{ scopeUserId: userId }] : [])],
-                },
+                    OR: [{ scopeUserId: null }, ...(user ? [{ scopeUserId: user?.sub }] : [])],
+                };
+            }
+
+            selectedTags = await this.prisma.tag.findMany({
+                where: selectedTagsWhere,
                 select: { id: true, name: true },
             });
 
@@ -149,14 +157,23 @@ export class TemplatesService {
             }
         }
 
-        const templatesFilter: Prisma.TemplateWhereInput = {
+        const allowedTagIdsConditions =
+            allowedTagIds && allowedTagIds.length > 0
+                ? allowedTagIds.map((tagId) => ({ tags: { some: { id: tagId } } }))
+                : [];
+
+        const userConditions = isAdmin
+            ? [{}]
+            : user
+              ? [{ OR: [{ isPublic: true }, { authorId: user?.sub }] }]
+              : [{ isPublic: true }];
+
+        let templatesFilter: Prisma.TemplateWhereInput = {
             AND: [
-                // Шаблон создан пользователем или публичный
-                userId ? { OR: [{ isPublic: true }, { authorId: userId }] } : { isPublic: true },
                 // Шаблон содержит все переданные разрешенные теги
-                ...(allowedTagIds && allowedTagIds.length > 0
-                    ? allowedTagIds.map((tagId) => ({ tags: { some: { id: tagId } } }))
-                    : []),
+                ...allowedTagIdsConditions,
+                // Пользователь имеет доступ к шаблону
+                ...userConditions,
             ],
         };
 

@@ -42,6 +42,7 @@ import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { TemplateListResponseDto } from './dto/template-list-response.dto';
 import { JwtOptionalAuthGuard } from 'src/auth/guards/jwt-optional-auth.guard';
 import { OptionalCurrentUserId } from 'src/common/decorators/optional-current-user-id.decorator';
+import { OptionalCurrentUser } from 'src/common/decorators/optional-current-user.decorator ';
 import { TemplateQueryDto } from './dto/template-query.dto';
 import { MyTemplateListResponseDto } from './dto/my-template-list-response.dto';
 import { UpdateTemplateDto } from './dto/update-template.dto';
@@ -74,9 +75,9 @@ export class TemplatesController {
     @Get()
     async getAll(
         @Query() query: TemplateQueryDto,
-        @OptionalCurrentUserId() userId: string | null,
+        @OptionalCurrentUser() user: { sub: string; role: string } | null,
     ): Promise<TemplateListResponseDto> {
-        const result = await this.templatesService.getAll(userId, query);
+        const result = await this.templatesService.getAll(user, query);
         const templates = result.templates.map((t) => toTemplateResponseDto(t));
         return {
             data: templates,
