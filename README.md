@@ -1,6 +1,8 @@
 # Snippet Manager
 
-#### REST API для управления шаблонами сообщений с умной системой тегов на NestJS.
+#### REST API для управления шаблонами сообщений с динамической иерархией тегов на NestJS.
+
+**Демо:** [https://sm.demkalab.ru](https://sm.demkalab.ru) ([фронтенд](https://github.com/oleg-insights/snippet-manager-frontend) + бэкенд)
 
 ### Стек
 
@@ -26,11 +28,6 @@
 - Rate limiting
 - Уведомления в реальном времени через **WebSockets** (оповещение о публикации шаблона)
 
-### Развертывание и запуск (docker-compose):
-
-1. Переименовать файлы env (убрать .example) и указать значения переменных
-2. Собрать и запустить приложение: `docker-compose up -d --build`
-
 ### Развертывание и запуск (localhost):
 
 1. Переименовать файлы env (убрать .example) и указать значения переменных
@@ -40,6 +37,19 @@
 5. Применить миграции: `npm run db:migrate:dev`
 6. Сгенерировать клиент Prisma: `npm run db:generate`
 7. Запустить приложение: `npm run start:dev`
+
+### Запуск в связке с фронтендом через Docker:
+
+1. Склонировать репозиторий [фронтенда](https://github.com/oleg-insights/snippet-manager-frontend) и этот репозиторий в соседние папки:
+
+```
+snippet-manager-backend/
+snippet-manager-frontend/
+```
+
+2. Переименовать файлы env (убрать .example) и указать значения переменных
+3. В папке бэкенда выполнить: `docker-compose up -d --build`
+4. API будет доступен по адресу `http://localhost:3000`
 
 ### Тестирование:
 
@@ -59,6 +69,7 @@
 
 ### Доступные ресурсы:
 
+- **API**: `http://localhost:3000`
 - **Swagger**: `http://localhost:3000/api-docs`
 
 ### Архитектура
