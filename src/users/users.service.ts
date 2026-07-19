@@ -60,7 +60,7 @@ export class UsersService {
             users,
             meta: {
                 totalItems,
-                totalPages: Math.ceil(totalItems / limit),
+                totalPages: limit > 0 ? Math.ceil(totalItems / limit) : 1,
                 currentPage: page,
                 limit,
             },
