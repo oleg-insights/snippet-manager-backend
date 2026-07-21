@@ -6,7 +6,7 @@ services:
         env_file:
             - .env
         ports:
-            - '3000:3000'
+            - '3002:3002'
         restart: unless-stopped
         depends_on:
             db:
@@ -35,8 +35,6 @@ services:
     redis:
         image: redis:alpine
         container_name: snippet-redis
-        ports:
-            - '6379:6379'
         restart: unless-stopped
         healthcheck:
             test: ['CMD', 'redis-cli', 'ping']
@@ -47,7 +45,7 @@ services:
         build: ../snippet-manager-frontend
         container_name: snippet-web
         ports:
-        - "80:80"
+        - "3001:80"
         depends_on:
         - backend
         restart: unless-stopped
