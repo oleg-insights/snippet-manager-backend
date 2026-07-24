@@ -22,16 +22,20 @@ import { UserPrivateResponseDto } from './dto/user-private-response.dto';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import type { Response } from 'express';
-import { cookieConfig } from 'src/common/config/cookie.config';
+import { getCookieConfig } from 'src/common/config/cookie.config';
 import { AccessToken } from 'src/auth/decorators/access-token.decorator';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ConfigService } from '@nestjs/config';
 
 @ApiTags('Users')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UsersController {
-    constructor(private readonly usersService: UsersService) {}
+    constructor(
+        private readonly usersService: UsersService,
+        private readonly configService: ConfigService,
+    ) {}
 
     @ApiOperation({ summary: 'Получение списка пользователей' })
     @ApiOkResponse({ description: 'Пользователи успешно получены', type: UserPublicListResponseDto })
@@ -83,7 +87,7 @@ export class UsersController {
         @Res({ passthrough: true }) res: Response,
     ): Promise<void> {
         await this.usersService.updatePassword(userId, accessToken, dto);
-        res.clearCookie('refreshToken', cookieConfig);
+        res.clearCookie('refreshToken', getCookieConfig(this.configService));
     }
 
     @HttpCode(200)

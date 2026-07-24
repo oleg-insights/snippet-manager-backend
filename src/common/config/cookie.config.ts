@@ -1,8 +1,9 @@
+import { ConfigService } from '@nestjs/config';
 import { CookieOptions } from 'express';
 
-export const cookieConfig: CookieOptions = {
+export const getCookieConfig = (configService: ConfigService): CookieOptions => ({
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: configService.get<string>('NODE_ENV') === 'production',
     sameSite: 'strict',
     path: '/',
-};
+});

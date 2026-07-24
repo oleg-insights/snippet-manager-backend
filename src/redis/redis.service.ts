@@ -1,12 +1,13 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 
 @Injectable()
 export class RedisService extends Redis implements OnModuleInit, OnModuleDestroy {
     private readonly logger = new Logger(RedisService.name);
 
-    constructor() {
-        const redisUrl = process.env.REDIS_URL;
+    constructor(configService: ConfigService) {
+        const redisUrl = configService.get<string>('REDIS_URL');
 
         if (redisUrl) {
             super(redisUrl);
@@ -16,7 +17,7 @@ export class RedisService extends Redis implements OnModuleInit, OnModuleDestroy
     }
 
     onModuleInit() {
-        this.on('connect', () => this.logger.log('[Redis]:', 'Соединение установлено'));
+        this.on('connect', () => this.logger.log('Соединение установлено'));
 
         this.on('error', (err) => {
             if (err instanceof AggregateError) {

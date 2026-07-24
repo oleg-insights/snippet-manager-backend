@@ -37,18 +37,22 @@ import {
 } from '../common/dto/error-responses.dto';
 import { LoginUserResponseDto } from './dto/login-user-response.dto';
 import { RefreshResponseDto } from './dto/refresh-response.dto';
-import { cookieConfig } from '../common/config/cookie.config';
+import { getCookieConfig } from '../common/config/cookie.config';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import type { Request, Response } from 'express';
 import { Throttle } from '@nestjs/throttler';
 import { CustomThrottlerGuard } from 'src/common/guards/custom-trottler.guard';
 import { RefreshResponse } from './interfaces/refresh-response';
+import { ConfigService } from '@nestjs/config';
 
 @ApiTags('Auth')
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {}
+    constructor(
+        private readonly authService: AuthService,
+        private readonly configService: ConfigService,
+    ) {}
 
     @ApiOperation({ summary: 'Регистрация пользователя' })
     @ApiCreatedResponse({ description: 'Пользователь успешно зарегистрирован', type: UserPrivateResponseDto })
@@ -94,7 +98,7 @@ export class AuthController {
         await this.authService.createSession(user.id, refreshToken, expiresAt, userAgent, ip);
 
         res.cookie('refreshToken', refreshToken, {
-            ...cookieConfig,
+            ...getCookieConfig(this.configService),
             expires: expiresAt,
         });
 
@@ -141,7 +145,7 @@ export class AuthController {
         }: RefreshResponse = await this.authService.refresh(refreshToken, userAgent, ip);
 
         res.cookie('refreshToken', newRefreshToken, {
-            ...cookieConfig,
+            ...getCookieConfig(this.configService),
             expires: expiresAt,
         });
 
@@ -169,6 +173,6 @@ export class AuthController {
 
         await this.authService.logoutUser(accessToken, refreshToken);
 
-        res.clearCookie('refreshToken', cookieConfig);
+        res.clearCookie('refreshToken', getCookieConfig(this.configService));
     }
 }
