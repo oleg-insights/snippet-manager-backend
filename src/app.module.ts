@@ -10,6 +10,8 @@ import { AdminModule } from './admin/admin.module';
 import { envSchema } from './common/config/env.validation';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { NotificationsModule } from './notifications/notifications.module';
+import { APP_FILTER } from '@nestjs/core';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 @Module({
     imports: [
@@ -38,6 +40,12 @@ import { NotificationsModule } from './notifications/notifications.module';
         UsersModule,
         AdminModule,
         NotificationsModule,
+    ],
+    providers: [
+        {
+            provide: APP_FILTER,
+            useClass: HttpExceptionFilter,
+        },
     ],
 })
 export class AppModule {}
